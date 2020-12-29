@@ -1,6 +1,7 @@
 # firebase_database_mocks
-
-A new Flutter project.
+Fakes to write unit tests for FirebaseDatabase (real-time database). Get Instance
+`MockFirebaseDatabase.instance`, then pass it around your project as if it were a
+`FirebaseDatabase.instance`. This mock keep data in memory while test running.
 
 ## Usage
 ```dart
