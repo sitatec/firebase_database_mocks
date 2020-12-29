@@ -138,11 +138,11 @@ void main() {
             'nkey2': {'otheNkey': 'nestedValue'}
           }));
 
-      //   expect((await databaseReference.child('tes/key/nkey1').once()).value,
-      //       equals('value1'));
+      expect((await databaseReference.child('tes/key/nkey1').once()).value,
+          equals('value1'));
 
-      //   expect((await databaseReference.child('tes/key/nkey2').once()).value,
-      //       equals({'otheNkey': 'nestedValue'}));
+      expect((await databaseReference.child('tes/key/nkey2').once()).value,
+          equals({'otheNkey': 'nestedValue'}));
     });
   });
 
