@@ -1,5 +1,5 @@
 # firebase_database_mocks
-Fakes to write unit tests for FirebaseDatabase (real-time database). Get Instance
+Mocks library to write unit tests for FirebaseDatabase (real-time database). Get Instance
 `MockFirebaseDatabase.instance`, then pass it around your project as if it were a
 `FirebaseDatabase.instance`. This mock keep data in memory while test running.
 
