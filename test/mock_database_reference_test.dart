@@ -99,22 +99,51 @@ void main() {
     //   );
     // });
   });
-  group('Set any type of data : ', () {
+  group('Work with any type of data : ', () {
     test('Should set String', () async {
       await databaseReference.child('test').set('value');
       expect(
         (await databaseReference.child('test').once()).value,
         equals('value'),
       );
-      await databaseReference.child('otherTest').set('otherValue');
+      await databaseReference.child('otherTest/test').set('otherValue');
       expect(
-        (await databaseReference.child('otherTest').once()).value,
+        (await databaseReference.child('otherTest/test').once()).value,
         equals('otherValue'),
       );
     });
-    // await databaseReference.child('test').set({'key': 'value'});
-    // expect((await databaseReference.child('test').once()).value,
-    //     equals({'key': 'value'}));
+    test('Should set Map', () async {
+      await databaseReference.child('test').set({'key': 'value'});
+      expect((await databaseReference.child('test').once()).value,
+          equals({'key': 'value'}));
+    });
+
+    test(
+        'Should get nested Map even if the keys of maps was not set individually',
+        () async {
+      const nestedMap = {
+        'key': {
+          'nkey1': 'value1',
+          'nkey2': {'otheNkey': 'nestedValue'}
+        }
+      };
+      await databaseReference.child('tes').set(nestedMap);
+      expect((await databaseReference.child('tes').once()).value,
+          equals(nestedMap));
+
+      expect(
+          (await databaseReference.child('tes/key').once()).value,
+          equals({
+            'nkey1': 'value1',
+            'nkey2': {'otheNkey': 'nestedValue'}
+          }));
+
+      //   expect((await databaseReference.child('tes/key/nkey1').once()).value,
+      //       equals('value1'));
+
+      //   expect((await databaseReference.child('tes/key/nkey2').once()).value,
+      //       equals({'otheNkey': 'nestedValue'}));
+    });
   });
 
   // group('Set data at any node reference :', null);
@@ -133,6 +162,7 @@ void main() {
         (await newDatabaseReference.child('test1').once()).value,
         equals('value1'),
       );
+      print('test1 passed');
       expect(
         (await newDatabaseReference.child('test2/test2').once()).value,
         equals('value2'),
@@ -143,7 +173,14 @@ void main() {
       );
     });
   });
+
+  test('Should return a stream of data', () async {
+    await databaseReference.child('streamTest').set('StreamVal');
+    final stream = databaseReference.child('streamTest').onValue;
+    expect((await stream.first).snapshot.value, equals('StreamVal'));
+  });
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.
+
   // test(
   //     'Should not persist data if setting "persistData" of MockFirebaseData is false',
   //     () async {
@@ -174,5 +211,4 @@ void main() {
   //     isNull,
   //   );
   // });
-  //Todo test nonexistent data should'nt return any data.
 }

@@ -8,11 +8,16 @@ import 'mock_firebase_database.dart';
 class MockDatabaseReference extends Mock implements DatabaseReference {
   var _nodePath = '/';
   // ignore: prefer_final_fields
-  static final _persitedData = <String, dynamic>{};
+  static var _persitedData = <String, dynamic>{};
   var _volatileData = <String, dynamic>{};
   MockDatabaseReference();
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
+  }
+  // TODO implement real [onchange] (may yield each change).
+  Stream<Event> get onValue async* {
+    final data = await once();
+    yield MockEvent._(data.value);
   }
 
   Map<String, dynamic> get _data {
@@ -20,6 +25,13 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
       return _persitedData;
     }
     return _volatileData;
+  }
+
+  set _data(data) {
+    if (MockFirebaseDatabase.persistData) {
+      _persitedData = data;
+    } else
+      return _volatileData = data;
   }
 
   @override
@@ -38,78 +50,98 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   @override
   // ignore: missing_return
   Future<void> set(dynamic value, {dynamic priority}) {
+    if (_nodePath == '/') {
+      _data = value;
+      return null;
+    }
     var nodePathWithoutSlashesAtEndAndStart =
         _nodePath.substring(1, _nodePath.length - 1);
     var nodesList = nodePathWithoutSlashesAtEndAndStart.split('/');
     var tempData = <String, dynamic>{};
     Map<String, dynamic> lastNodeInCurrentData;
     var nodeIndexReference = _Int(0);
-    if (_data.isEmpty) {
+    if (_data[nodesList.first] == null) {
       lastNodeInCurrentData = _data;
     } else {
-      lastNodeInCurrentData = getNode(
-        data: _data,
-        nodesList: nodesList,
-        nodeIndex: nodeIndexReference.increment(),
-      );
+      lastNodeInCurrentData = _getNextNodeData(
+          data: _data, nodesList: nodesList, nodeIndex: nodeIndexReference);
     }
     var nodeIndex = nodeIndexReference.value;
-    if (nodesList.length <= nodeIndex) {
+    var noNewNodeToAdd = nodesList.length <= nodeIndex;
+    if (noNewNodeToAdd) {
       lastNodeInCurrentData[nodesList.last] = value;
       return null;
     }
     var firstNodeInNewData = nodesList[nodeIndex++];
     if (nodeIndex < nodesList.length) {
-      for (; nodeIndex < nodesList.length; nodeIndex++) {
-        if (nodeIndex + 1 < nodesList.length) {
-          tempData[nodesList[nodeIndex]] = {nodesList[nodeIndex + 1]: null};
-          tempData = tempData[nodesList[nodeIndex]];
-        } else {
-          tempData[nodesList[nodeIndex]] = value;
-        }
-      }
-      lastNodeInCurrentData
-          .addAll({firstNodeInNewData: _makeSupportGenericValue(tempData)});
+      tempData = _buildNewNodesTree(
+        nodeIndex: nodeIndex,
+        nodesList: nodesList,
+        data: tempData,
+        value: value,
+      );
+      lastNodeInCurrentData.addAll({firstNodeInNewData: tempData});
     } else {
-      if (value is Map) value = _makeSupportGenericValue(value);
+      if (value is Map) value = value;
       lastNodeInCurrentData.addAll({firstNodeInNewData: value});
     }
   }
 
-  dynamic getNode(
-      {@required dynamic data,
-      @required List<String> nodesList,
-      @required _Int nodeIndex}) {
-    // print(data);
-    // print(nodeIndex.value);
-    if (nodesList.length == nodeIndex.value ||
-        !(data[nodesList[nodeIndex.value]] is Map)) return data;
-    return getNode(
-        data: data[nodesList[nodeIndex.value]],
-        nodesList: nodesList,
-        nodeIndex: nodeIndex.increment());
+  Map<String, dynamic> _buildNewNodesTree({
+    @required dynamic data,
+    @required List<String> nodesList,
+    @required int nodeIndex,
+    @required value,
+  }) {
+    var nextNodeIndex = nodeIndex + 1;
+    if (nodeIndex + 1 < nodesList.length) {
+      data[nodesList[nodeIndex]] = {nodesList[nextNodeIndex]: Object()};
+      _buildNewNodesTree(
+          data: data[nodesList[nodeIndex]],
+          nodesList: nodesList,
+          nodeIndex: nextNodeIndex,
+          value: value);
+    } else
+      data[nodesList[nodeIndex]] = value;
+    return data;
+  }
+
+  _getNextNodeData({
+    @required dynamic data,
+    @required List<String> nodesList,
+    @required _Int nodeIndex,
+  }) {
+    if (nodesList.length <= nodeIndex.value ||
+        !(data[nodesList[nodeIndex.value]] is Map)) {
+      nodeIndex.increment();
+      return data;
+    }
+    return _getNextNodeData(
+      data: data[nodesList[nodeIndex.value]],
+      nodesList: nodesList,
+      nodeIndex: nodeIndex.increment(),
+    );
   }
 
   @override
   Future<DataSnapshot> once() {
-    return Future(() {
-      var tempData = _data;
-      var nodePath = _nodePath.substring(1, _nodePath.length - 1);
-      var nodeList = nodePath.split('/');
-      if (nodeList.length > 1) {
-        for (var node in nodeList) {
-          nodePath = node;
-          if (tempData[node] == null) {
-            nodePath = '';
-            break;
-          }
-          if (tempData[node] is Map) {
-            tempData = tempData[node];
-          }
+    var tempData = _data;
+    // remove start and end slashes.
+    var nodePath = _nodePath.substring(1, _nodePath.length - 1);
+    var nodeList = nodePath.split('/');
+    if (nodeList.length > 1) {
+      for (var i = 0; i < nodeList.length; i++) {
+        nodePath = nodeList[i];
+        var nonExistentNodeFound = tempData[nodePath] == null;
+        if (nonExistentNodeFound || (i + 1) == nodeList.length) {
+          break;
+        }
+        if (tempData[nodePath] is Map) {
+          tempData = tempData[nodePath];
         }
       }
-      return MockDataSnapshot(tempData[nodePath]);
-    });
+    }
+    return Future.value(MockDataSnapshot(tempData[nodePath]));
   }
 }
 
@@ -122,13 +154,19 @@ class _Int {
   }
 }
 
-Map<String, Object> _makeSupportGenericValue(Map<String, dynamic> data) {
-  var _dataWithGenericValue = {'__generic_mock_data_value__': Object()};
-  _dataWithGenericValue.addAll(data);
-  _dataWithGenericValue.forEach((key, value) {
-    if (value is Map) {
-      _dataWithGenericValue[key] = _makeSupportGenericValue(value);
-    }
-  });
-  return _dataWithGenericValue;
+class MockEvent extends Mock implements Event {
+  MockEvent._(data) : snapshot = MockDataSnapshot(data);
+
+  final DataSnapshot snapshot;
 }
+
+// Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
+//   var _dataWithGenericValue = {'__generic_mock_data_value__': Object()};
+//   _dataWithGenericValue.addAll(data);
+//   _dataWithGenericValue.forEach((key, value) {
+//     if (value is Map) {
+//       _dataWithGenericValue[key] = _makeSupportGenericValue(value);
+//     }
+//   });
+//   return _dataWithGenericValue;
+// }
