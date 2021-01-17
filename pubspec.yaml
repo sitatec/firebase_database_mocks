@@ -1,4 +1,5 @@
 name: firebase_database_mocks
+
 description: Fakes to write unit tests for FirebaseDatabase (real-time database). Get Instance MockFirebaseDatabase.instance, then pass it around your project as if it were a FirebaseDatabase.instance. This mock keep data in memory while test running.
 
 version: 0.1.0
