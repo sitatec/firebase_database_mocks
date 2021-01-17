@@ -72,6 +72,9 @@ void main() {
 
 ```
 
+- [Issues](https://github.com/sitatec/firebase_database_mocks/issues)
+- [Pull requests](https://github.com/sitatec/firebase_database_mocks/pulls)
+
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
