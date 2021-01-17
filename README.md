@@ -1,4 +1,7 @@
 # firebase_database_mocks
+
+[![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks)
+
 Mocks library to write unit tests for FirebaseDatabase (real-time database). Get Instance
 `MockFirebaseDatabase.instance`, then pass it around your project as if it were a
 `FirebaseDatabase.instance`. This mock keep data in memory while test running.
@@ -71,6 +74,13 @@ void main() {
 }
 
 ```
+
+As you can see you don't need to initialize firabase core for testing or call
+`TestWidgetsFlutterBinding.ensureInitialized()` before using `MockFirebaseDatabase`
+but in bonus if you use anther firebase service which need it you can simply call
+the `setupFirebaseMocks()` top level function which performs all required operations 
+for testing a firebase service which isn't fully mocked like `MockFirebaseDatabase`.
+
 
 - [Issues](https://github.com/sitatec/firebase_database_mocks/issues)
 - [Pull requests](https://github.com/sitatec/firebase_database_mocks/pulls)
