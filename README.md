@@ -3,7 +3,7 @@
 [![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks) [![style: effective dart](https://img.shields.io/badge/style-pedantic-blue)](https://github.com/google/pedantic) [![test: passing](https://img.shields.io/badge/test-passing-green)](https://github.com/sitatec/firebase_database_mocks/tree/main/test)
 
 Mocks library to write unit tests for FirebaseDatabase (real-time database). Get Instance
-`MockFirebaseDatabase.instance`, then pass it around your project as if it were a
+`MockFirebaseDatabase.instance`, then pass it around your project as if it was a
 `FirebaseDatabase.instance`. This mock keep data in memory while test running.
 
 ## Usage
