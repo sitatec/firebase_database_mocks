@@ -77,9 +77,9 @@ void main() {
 
 As you can see you don't need to initialize firabase core for testing or call
 `TestWidgetsFlutterBinding.ensureInitialized()` before using `MockFirebaseDatabase`
-but in bonus if you use anther firebase service which need it you can simply call
+but in bonus if you use another firebase service that needs it you can simply call
 the `setupFirebaseMocks()` top level function which performs all required operations 
-for testing a firebase service which isn't fully mocked like `MockFirebaseDatabase`.
+for testing a firebase service that isn't fully mocked .
 
 
 - [Issues](https://github.com/sitatec/firebase_database_mocks/issues)
