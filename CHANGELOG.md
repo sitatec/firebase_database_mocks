@@ -1,3 +1,5 @@
+## 0.2.0
+* Migrate to Null safety
 ## 0.1.0+3
 * Fix typo in file name
 ## 0.1.0+2
