@@ -2,11 +2,19 @@
 
 [![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks)  [![test: passing](https://github.com/sitatec/firebase_database_mocks/actions/workflows/main.yml/badge.svg)](https://github.com/sitatec/firebase_database_mocks/actions) [![codecov](https://codecov.io/gh/sitatec/firebase_database_mocks/branch/main/graph/badge.svg?token=YLBE21OXGR)](https://codecov.io/gh/sitatec/firebase_database_mocks) [![style: effective dart](https://img.shields.io/badge/style-pedantic-blue)](https://github.com/google/pedantic)
 
-Mocks library to write unit tests for FirebaseDatabase (real-time database). Get Instance
-`MockFirebaseDatabase.instance`, then pass it around your project as if it was a
-`FirebaseDatabase.instance`. This mock keep data in memory while test running.
+A Library that make it easy to write unit tests for FirebaseDatabase (real-time database).
 
 ## Usage
+Get an Instance of `MockFirebaseDatabase` like this : `MockFirebaseDatabase.instance`, then use it in your tests as if it was the reel
+`FirebaseDatabase.instance`. 
+
+By default the library keeps the data in memory as long as the tests are running, but you can disable the data persistance as follow: 
+`MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);`.
+
+If the data persistance is disabled, each time you create an instance of `MockDatabaseReference` either by using the constructor: `MockDatabaseReference()`, or by geting the root reference on `MockFirebaseDatabase` instance : `MockFirebaseDatabase.instance.reference()` a new data store is created instead of using the cached one.
+> ___Note:___ The `MockFirebaseDatabase.setDataPersistanceEnabled()` function is currently experimental, so you might face some issues when you disable the data persitance.
+
+### Code Sample
 ```dart
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database_mocks/firebase_database_mocks.dart';
@@ -77,9 +85,9 @@ void main() {
 
 As you can see you don't need to initialize firabase core for testing or call
 `TestWidgetsFlutterBinding.ensureInitialized()` before using `MockFirebaseDatabase`
-but in bonus if you use another firebase service that needs it you can simply call
+but in bonus if you use another firebase service that needs it, you can simply call
 the `setupFirebaseMocks()` top level function which performs all required operations 
-for testing a firebase service that isn't fully mocked .
+for testing a firebase service that isn't fully mocked.
 
 
 - [Issues](https://github.com/sitatec/firebase_database_mocks/issues)
