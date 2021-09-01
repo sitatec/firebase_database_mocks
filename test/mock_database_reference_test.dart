@@ -1,9 +1,12 @@
+import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:firebase_database_mocks/src/mock_database_reference.dart';
+import 'package:firebase_database_mocks/src/set_up_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   MockDatabaseReference databaseReference;
   setUp(() {
+    setupFirebaseMocks(); // Just to make sure it that no exception is thrown.
     databaseReference = MockDatabaseReference();
   });
 
@@ -112,6 +115,32 @@ void main() {
         equals('otherValue'),
       );
     });
+
+    test('Should set data in nested nodes', () async {
+      databaseReference
+          .child('path_')
+          .child('mock_')
+          .child('test_')
+          .child('other_')
+          .set("NESTED");
+
+      expect(
+        (await databaseReference
+                .child('path_')
+                .child('mock_')
+                .child('test_')
+                .child('other_')
+                .once())
+            .value,
+        equals("NESTED"),
+      );
+      expect(
+        (await databaseReference.child('path_/mock_/test_/other_').once())
+            .value,
+        equals("NESTED"),
+      );
+    });
+
     test('Should set Map', () async {
       await databaseReference.child('test').set({'key': 'value'});
       expect((await databaseReference.child('test').once()).value,
@@ -178,6 +207,23 @@ void main() {
     await databaseReference.child('streamTest').set('StreamVal');
     final stream = databaseReference.child('streamTest').onValue;
     expect((await stream.first).snapshot.value, equals('StreamVal'));
+  });
+
+  group('Work with data persistance disabled : ', () {
+    // MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
+    final _databaseReference = MockDatabaseReference();
+    test('Should set String', () async {
+      await _databaseReference.child('test_').set('value');
+      expect(
+        (await _databaseReference.child('test_').once()).value,
+        equals('value'),
+      );
+      await _databaseReference.child('otherTest_/test').set('otherValue');
+      expect(
+        (await _databaseReference.child('otherTest_/test').once()).value,
+        equals('otherValue'),
+      );
+    });
   });
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.
 
