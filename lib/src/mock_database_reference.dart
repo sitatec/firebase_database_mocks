@@ -43,7 +43,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     path = (_nodePath + path).replaceAll(RegExp(r'^/+'), '');
     return MockDatabaseReference._(
       path,
-      MockFirebaseDatabase.persistData ? _volatileData : <String, dynamic>{},
+      _data,
     );
   }
 

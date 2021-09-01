@@ -178,7 +178,12 @@ void main() {
   // group('Set data at any node reference :', null);
 
   group('Data persistence : ', () {
+    tearDown(() {
+      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
+    });
+
     test('Should persist data while test running', () async {
+      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
       var databaseReference = MockDatabaseReference();
       await databaseReference.child('test1').set('value1');
       await databaseReference.child('test2/test2').set('value2');
@@ -201,6 +206,21 @@ void main() {
         equals('value3'),
       );
     });
+    test('Should not persist data', () async {
+      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
+      await databaseReference.child('test_').set('value');
+      expect(
+        (await databaseReference.child('test_').once()).value,
+        equals('value'),
+      );
+      await databaseReference.child('otherTest_/test').set('otherValue');
+      expect(
+        (await databaseReference.child('otherTest_/test').once()).value,
+        equals('otherValue'),
+      );
+      expect(
+          (await MockDatabaseReference().child('test_').once()).value, isNull);
+    });
   });
 
   test('Should return a stream of data', () async {
@@ -209,22 +229,6 @@ void main() {
     expect((await stream.first).snapshot.value, equals('StreamVal'));
   });
 
-  group('Work with data persistance disabled : ', () {
-    // MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
-    final _databaseReference = MockDatabaseReference();
-    test('Should set String', () async {
-      await _databaseReference.child('test_').set('value');
-      expect(
-        (await _databaseReference.child('test_').once()).value,
-        equals('value'),
-      );
-      await _databaseReference.child('otherTest_/test').set('otherValue');
-      expect(
-        (await _databaseReference.child('otherTest_/test').once()).value,
-        equals('otherValue'),
-      );
-    });
-  });
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.
 
   // test(
