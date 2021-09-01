@@ -38,6 +38,11 @@ jobs:
       - name: Test app 
         run: flutter test --coverage
         
+      - name: Exclude set_up_mocks.dart form coverage
+        run: | 
+          dart pub global activate remove_from_coverage
+          remove_from_coverage -f coverage/lcov.info -r 'set_up_mocks\.dart$'
+        
       - name: Upload coverage to Codecov 
         uses: codecov/codecov-action@v1 
         with: 
