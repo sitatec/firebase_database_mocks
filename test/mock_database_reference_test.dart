@@ -4,7 +4,7 @@ import 'package:firebase_database_mocks/src/set_up_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  MockDatabaseReference databaseReference;
+  late MockDatabaseReference databaseReference;
   setUp(() {
     setupFirebaseMocks(); // Just to make sure it that no exception is thrown.
     databaseReference = MockDatabaseReference();
@@ -184,12 +184,12 @@ void main() {
 
     test('Should persist data while test running', () async {
       MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
-      var databaseReference = MockDatabaseReference();
-      await databaseReference.child('test1').set('value1');
-      await databaseReference.child('test2/test2').set('value2');
-      await databaseReference.child('test1/test_one').set('value3');
-      databaseReference = null;
-      expect(databaseReference, isNull);
+      MockDatabaseReference? _databaseReference = MockDatabaseReference();
+      await _databaseReference.child('test1').set('value1');
+      await _databaseReference.child('test2/test2').set('value2');
+      await _databaseReference.child('test1/test_one').set('value3');
+      _databaseReference = null;
+      expect(_databaseReference, isNull);
 
       var newDatabaseReference = MockDatabaseReference();
       expect(

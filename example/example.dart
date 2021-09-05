@@ -6,14 +6,14 @@ class UserRepository {
   UserRepository(this.firebaseDatabase);
   FirebaseDatabase firebaseDatabase;
 
-  Future<String> getUserName(String userId) async {
+  Future<String?> getUserName(String userId) async {
     final userNameReference =
         firebaseDatabase.reference().child('users').child(userId).child('name');
     final dataSnapshot = await userNameReference.once();
     return dataSnapshot.value;
   }
 
-  Future<Map<String, dynamic>> getUser(String userId) async {
+  Future<Map<String, dynamic>?> getUser(String userId) async {
     final userNode = firebaseDatabase.reference().child('users/$userId');
     final dataSnapshot = await userNode.once();
     return dataSnapshot.value;
@@ -22,7 +22,7 @@ class UserRepository {
 
 void main() {
   FirebaseDatabase firebaseDatabase;
-  UserRepository userRepository;
+  late UserRepository userRepository;
   // Put fake data
   const userId = 'userId';
   const userName = 'Elon musk';
