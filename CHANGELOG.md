@@ -1,3 +1,6 @@
+## 0.3.0
+* Upgrade firebase_database to 9.0.3
+* Includes Breaking changes
 ## 0.2.0+1
 * Update Readme, improve test coverage and setup CI.
 ## 0.2.0
