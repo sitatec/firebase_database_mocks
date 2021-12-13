@@ -46,43 +46,51 @@ void main() {
     });
     test('Should return null when a nonexistent path is given', () async {
       expect(
-        (await databaseReference.child('fghgg').once()).value,
+        (await databaseReference.child('fghgg').once()).snapshot.value,
         isNull,
       );
       expect(
-        (await databaseReference.child('o_/therèè_/Test').once()).value,
+        (await databaseReference.child('o_/therèè_/Test').once())
+            .snapshot
+            .value,
         isNull,
       );
     });
 
     group('Should return null when a nonexistent path that', () {
       test('starts with existent node path is given', () async {
-        await databaseReference.child('existing_path').set('value');
+        await databaseReference.child('existing_path').set('snapshot.value');
         expect(
           (await databaseReference.child('existing_path/therèè_/Test').once())
+              .snapshot
               .value,
           isNull,
         );
       });
       test('wrap existent node path is given', () async {
-        await databaseReference.child('existing_path').set('value');
+        await databaseReference.child('existing_path').set('snapshot.value');
         expect(
           (await databaseReference.child('any/existing_path/thè_/Tt').once())
+              .snapshot
               .value,
           isNull,
         );
-        await databaseReference.child('tteesstt').set({'key': 'value'});
+        await databaseReference
+            .child('tteesstt')
+            .set({'key': 'snapshot.value'});
         expect(
           (await databaseReference.child('tttttst/path/tteesstt/Test').once())
+              .snapshot
               .value,
           isNull,
-          reason: 'With Map as value',
+          reason: 'With Map as snapshot.value',
         );
       });
       test('end with existent node path is given', () async {
-        await databaseReference.child('end').set('value');
+        await databaseReference.child('end').set('snapshot.value');
         expect(
           (await databaseReference.child('any/existing_path/Test/end').once())
+              .snapshot
               .value,
           isNull,
         );
@@ -104,14 +112,14 @@ void main() {
   });
   group('Work with any type of data : ', () {
     test('Should set String', () async {
-      await databaseReference.child('test').set('value');
+      await databaseReference.child('test').set('snapshot.value');
       expect(
-        (await databaseReference.child('test').once()).value,
-        equals('value'),
+        (await databaseReference.child('test').once()).snapshot.value,
+        equals('snapshot.value'),
       );
       await databaseReference.child('otherTest/test').set('otherValue');
       expect(
-        (await databaseReference.child('otherTest/test').once()).value,
+        (await databaseReference.child('otherTest/test').once()).snapshot.value,
         equals('otherValue'),
       );
     });
@@ -131,20 +139,22 @@ void main() {
                 .child('test_')
                 .child('other_')
                 .once())
+            .snapshot
             .value,
         equals("NESTED"),
       );
       expect(
         (await databaseReference.child('path_/mock_/test_/other_').once())
+            .snapshot
             .value,
         equals("NESTED"),
       );
     });
 
     test('Should set Map', () async {
-      await databaseReference.child('test').set({'key': 'value'});
-      expect((await databaseReference.child('test').once()).value,
-          equals({'key': 'value'}));
+      await databaseReference.child('test').set({'key': 'snapshot.value'});
+      expect((await databaseReference.child('test').once()).snapshot.value,
+          equals({'key': 'snapshot.value'}));
     });
 
     test(
@@ -157,20 +167,26 @@ void main() {
         }
       };
       await databaseReference.child('tes').set(nestedMap);
-      expect((await databaseReference.child('tes').once()).value,
+      expect((await databaseReference.child('tes').once()).snapshot.value,
           equals(nestedMap));
 
       expect(
-          (await databaseReference.child('tes/key').once()).value,
+          (await databaseReference.child('tes/key').once()).snapshot.value,
           equals({
             'nkey1': 'value1',
             'nkey2': {'otheNkey': 'nestedValue'}
           }));
 
-      expect((await databaseReference.child('tes/key/nkey1').once()).value,
+      expect(
+          (await databaseReference.child('tes/key/nkey1').once())
+              .snapshot
+              .value,
           equals('value1'));
 
-      expect((await databaseReference.child('tes/key/nkey2').once()).value,
+      expect(
+          (await databaseReference.child('tes/key/nkey2').once())
+              .snapshot
+              .value,
           equals({'otheNkey': 'nestedValue'}));
     });
   });
@@ -193,33 +209,38 @@ void main() {
 
       var newDatabaseReference = MockDatabaseReference();
       expect(
-        (await newDatabaseReference.child('test1').once()).value,
+        (await newDatabaseReference.child('test1').once()).snapshot.value,
         equals('value1'),
       );
       print('test1 passed');
       expect(
-        (await newDatabaseReference.child('test2/test2').once()).value,
+        (await newDatabaseReference.child('test2/test2').once()).snapshot.value,
         equals('value2'),
       );
       expect(
-        (await newDatabaseReference.child('test1/test_one').once()).value,
+        (await newDatabaseReference.child('test1/test_one').once())
+            .snapshot
+            .value,
         equals('value3'),
       );
     });
     test('Should not persist data', () async {
       MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
-      await databaseReference.child('test_').set('value');
+      await databaseReference.child('test_').set('snapshot.value');
       expect(
-        (await databaseReference.child('test_').once()).value,
-        equals('value'),
+        (await databaseReference.child('test_').once()).snapshot.value,
+        equals('snapshot.value'),
       );
       await databaseReference.child('otherTest_/test').set('otherValue');
       expect(
-        (await databaseReference.child('otherTest_/test').once()).value,
+        (await databaseReference.child('otherTest_/test').once())
+            .snapshot
+            .value,
         equals('otherValue'),
       );
       expect(
-          (await MockDatabaseReference().child('test_').once()).value, isNull);
+          (await MockDatabaseReference().child('test_').once()).snapshot.value,
+          isNull);
     });
   });
 
@@ -241,7 +262,7 @@ void main() {
   //   await databaseReference.child('test2/test2').set('value2');
   //   await databaseReference.child('test1/test_one').set('value3');
   //   expect(
-  //     (await test.once()).value,
+  //     (await test.once()).snapshot.value,
   //     equals('value1'),
   //   );
   //   databaseReference = null;
@@ -249,15 +270,15 @@ void main() {
 
   //   var newDatabaseReference = MockDatabaseReference();
   //   expect(
-  //     (await newDatabaseReference.child('test1').once()).value,
+  //     (await newDatabaseReference.child('test1').once()).snapshot.value,
   //     isNull,
   //   );
   //   expect(
-  //     (await newDatabaseReference.child('test2/test2').once()).value,
+  //     (await newDatabaseReference.child('test2/test2').once()).snapshot.value,
   //     isNull,
   //   );
   //   expect(
-  //     (await newDatabaseReference.child('test1/test_one').once()).value,
+  //     (await newDatabaseReference.child('test1/test_one').once()).snapshot.value,
   //     isNull,
   //   );
   // });

@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database_mocks/src/mock_database_event.dart';
 import 'package:mockito/mockito.dart';
 
 import 'mock_data_snapshot.dart';
@@ -13,10 +14,10 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
   }
-  // TODO implement real [onchange] (may yield each change).
-  Stream<Event> get onValue async* {
-    final data = await once();
-    yield MockEvent._(data.value);
+
+  /// TODO implement real [onchange] (should yield each change).
+  Stream<DatabaseEvent> get onValue async* {
+    yield await once();
   }
 
   Map<String, dynamic>? get _data {
@@ -122,7 +123,10 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   }
 
   @override
-  Future<DataSnapshot> once() {
+
+  /// __WARNING!__ For now only the DatabaseEventType.value event is supported.
+  Future<DatabaseEvent> once(
+      [DatabaseEventType eventType = DatabaseEventType.value]) {
     var tempData = _data;
     // remove start and end slashes.
     var nodePath = _nodePath.substring(1, _nodePath.length - 1);
@@ -139,7 +143,8 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
         }
       }
     }
-    return Future.value(MockDataSnapshot(tempData![nodePath]));
+    return Future.value(
+        MockDatabaseEvent(MockDataSnapshot(tempData![nodePath])));
   }
 }
 
@@ -152,11 +157,6 @@ class _Int {
   }
 }
 
-class MockEvent extends Mock implements Event {
-  MockEvent._(data) : snapshot = MockDataSnapshot(data);
-
-  final DataSnapshot snapshot;
-}
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
 //   var _dataWithGenericValue = {'__generic_mock_data_value__': Object()};

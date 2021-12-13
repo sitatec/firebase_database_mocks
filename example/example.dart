@@ -9,14 +9,14 @@ class UserRepository {
   Future<String?> getUserName(String userId) async {
     final userNameReference =
         firebaseDatabase.reference().child('users').child(userId).child('name');
-    final dataSnapshot = await userNameReference.once();
-    return dataSnapshot.value;
+    final databaseEvent = await userNameReference.once();
+    return databaseEvent.snapshot.value as String?;
   }
 
   Future<Map<String, dynamic>?> getUser(String userId) async {
     final userNode = firebaseDatabase.reference().child('users/$userId');
-    final dataSnapshot = await userNode.once();
-    return dataSnapshot.value;
+    final databaseEvent = await userNode.once();
+    return databaseEvent.snapshot.value as Map<String, dynamic>?;
   }
 }
 
