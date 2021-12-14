@@ -1,3 +1,5 @@
+## 0.3.1
+* implement FirebaseDatabase.ref()
 ## 0.3.0
 * Upgrade firebase_database to 9.0.3
 * Includes Breaking changes
