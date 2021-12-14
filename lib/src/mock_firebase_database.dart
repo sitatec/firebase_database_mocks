@@ -7,7 +7,15 @@ class MockFirebaseDatabase extends Mock implements FirebaseDatabase {
   static FirebaseDatabase get instance => MockFirebaseDatabase();
   static get persistData => _persistData;
   @override
-  DatabaseReference reference() => MockDatabaseReference();
+  DatabaseReference reference() => ref();
+
+  DatabaseReference ref([String? path]) {
+    if (path != null) {
+      return MockDatabaseReference()..child(path);
+    }
+    return MockDatabaseReference();
+  }
+
   // ignore: unused_field
   static bool _persistData = true;
   //Todo support non persistence.
