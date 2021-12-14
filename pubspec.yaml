@@ -2,7 +2,7 @@ name: firebase_database_mocks
 
 description: Fakes to write unit tests for FirebaseDatabase (real-time database).
 
-version: 0.3.1
+version: 0.3.2
 
 repository: https://github.com/sitatec/firebase_database_mocks.git
 homepage: https://github.com/sitatec/firebase_database_mocks.git

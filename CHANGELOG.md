@@ -1,3 +1,5 @@
+## 0.3.2
+* fix and test MockFirebaseDatabase.instance.ref()
 ## 0.3.1
 * implement FirebaseDatabase.ref()
 ## 0.3.0
