@@ -8,13 +8,13 @@ class UserRepository {
 
   Future<String?> getUserName(String userId) async {
     final userNameReference =
-        firebaseDatabase.reference().child('users').child(userId).child('name');
+        firebaseDatabase.ref().child('users').child(userId).child('name');
     final databaseEvent = await userNameReference.once();
     return databaseEvent.snapshot.value as String?;
   }
 
   Future<Map<String, dynamic>?> getUser(String userId) async {
-    final userNode = firebaseDatabase.reference().child('users/$userId');
+    final userNode = firebaseDatabase.ref().child('users/$userId');
     final databaseEvent = await userNode.once();
     return databaseEvent.snapshot.value as Map<String, dynamic>?;
   }
@@ -40,7 +40,7 @@ void main() {
       }
     }
   };
-  MockFirebaseDatabase.instance.reference().set(fakeData);
+  MockFirebaseDatabase.instance.ref().set(fakeData);
   setUp(() {
     firebaseDatabase = MockFirebaseDatabase.instance;
     userRepository = UserRepository(firebaseDatabase);

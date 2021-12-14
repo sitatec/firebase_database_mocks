@@ -11,6 +11,18 @@ void main() {
   });
 
   group('Node path handling : ', () {
+    test("Should get a reference with a initial path", () {
+      expect(
+        MockFirebaseDatabase.instance.ref("initialPath").path,
+        MockDatabaseReference().child("initialPath").path,
+      );
+    });
+    test("Should get reference using the deprecated reference() method", () {
+      expect(
+        MockFirebaseDatabase.instance.reference().child("deprecated").path,
+        MockDatabaseReference().child("deprecated").path,
+      );
+    });
     test('Should work with slash as prefix', () {
       expect(
         databaseReference.child('/test').path,
