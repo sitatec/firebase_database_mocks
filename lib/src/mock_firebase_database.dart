@@ -9,6 +9,7 @@ class MockFirebaseDatabase extends Mock implements FirebaseDatabase {
   @override
   DatabaseReference reference() => ref();
 
+  @override
   DatabaseReference ref([String? path]) {
     if (path != null) {
       return MockDatabaseReference()..child(path);
