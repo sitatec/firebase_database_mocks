@@ -2,7 +2,7 @@ name: firebase_database_mocks
 
 description: Fakes to write unit tests for FirebaseDatabase (real-time database).
 
-version: 0.3.2
+version: 0.3.3
 
 repository: https://github.com/sitatec/firebase_database_mocks.git
 homepage: https://github.com/sitatec/firebase_database_mocks.git
@@ -14,9 +14,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_database: ^9.0.3
+  firebase_database: ^9.0.18
   flutter_lints: ^1.0.4
-  mockito: ^5.0.16
-  firebase_core_platform_interface: ^4.2.2
+  mockito: ^5.2.0
+  firebase_core_platform_interface: ^4.4.3
   flutter_test:
     sdk: flutter
