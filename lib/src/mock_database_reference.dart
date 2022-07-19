@@ -35,6 +35,9 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   }
 
   @override
+  String? get key => _nodePath == '/' ? null : _nodePath.split('/').last;
+
+  @override
   String get path => _nodePath;
 
   @override
@@ -122,11 +125,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     );
   }
 
-  @override
-
-  /// __WARNING!__ For now only the DatabaseEventType.value event is supported.
-  Future<DatabaseEvent> once(
-      [DatabaseEventType eventType = DatabaseEventType.value]) {
+  dynamic _getCurrentData() {
     var tempData = _data;
     // remove start and end slashes.
     var nodePath = _nodePath.substring(1, _nodePath.length - 1);
@@ -143,8 +142,24 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
         }
       }
     }
+
+    return tempData![nodePath];
+  }
+
+  @override
+
+  /// __WARNING!__ For now only the DatabaseEventType.value event is supported.
+  Future<DatabaseEvent> once(
+      [DatabaseEventType eventType = DatabaseEventType.value]) {
+    var tempData = _getCurrentData();
     return Future.value(
-        MockDatabaseEvent(MockDataSnapshot(tempData![nodePath])));
+        MockDatabaseEvent(MockDataSnapshot(this, tempData)));
+  }
+
+  @override
+  Future<DataSnapshot> get(){
+    var tempData = _getCurrentData();
+    return Future.value(MockDataSnapshot(this, tempData));
   }
 }
 

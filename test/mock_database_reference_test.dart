@@ -68,6 +68,11 @@ void main() {
         isNull,
       );
     });
+    test('Should set exists based on whether data exists at given path', () async {
+      await databaseReference.child('existing_path').set('value');
+      expect((await databaseReference.child('existing_path').get()).exists, isTrue);
+      expect((await databaseReference.child('foobar').get()).exists, isFalse);
+    });
 
     group('Should return null when a nonexistent path that', () {
       test('starts with existent node path is given', () async {
