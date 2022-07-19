@@ -8,7 +8,7 @@ import 'mock_firebase_database.dart';
 class MockDatabaseReference extends Mock implements DatabaseReference {
   var _nodePath = '/';
   // ignore: prefer_final_fields
-  static Map<String, dynamic>? _persitedData = <String, dynamic>{};
+  static Map<String, dynamic>? _persistedData = <String, dynamic>{};
   Map<String, dynamic>? _volatileData = <String, dynamic>{};
   MockDatabaseReference();
   MockDatabaseReference._(nodePath, [this._volatileData]) {
@@ -22,14 +22,14 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   Map<String, dynamic>? get _data {
     if (MockFirebaseDatabase.persistData) {
-      return _persitedData;
+      return _persistedData;
     }
     return _volatileData;
   }
 
   set _data(data) {
     if (MockFirebaseDatabase.persistData) {
-      _persitedData = data;
+      _persistedData = data;
     } else
       return _volatileData = data;
   }

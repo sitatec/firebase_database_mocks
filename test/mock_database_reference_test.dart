@@ -212,11 +212,11 @@ void main() {
 
   group('Data persistence : ', () {
     tearDown(() {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: true);
     });
 
     test('Should persist data while test running', () async {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: true);
       MockDatabaseReference? _databaseReference = MockDatabaseReference();
       await _databaseReference.child('test1').set('value1');
       await _databaseReference.child('test2/test2').set('value2');
@@ -242,7 +242,7 @@ void main() {
       );
     });
     test('Should not persist data', () async {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: false);
       await databaseReference.child('test_').set('snapshot.value');
       expect(
         (await databaseReference.child('test_').once()).snapshot.value,

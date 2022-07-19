@@ -20,7 +20,7 @@ class MockFirebaseDatabase extends Mock implements FirebaseDatabase {
   // ignore: unused_field
   static bool _persistData = true;
   //Todo support non persistence.
-  static void setDataPersistanceEnabled({bool ennabled = true}) {
-    _persistData = ennabled;
+  static void setDataPersistenceEnabled({bool enabled = true}) {
+    _persistData = enabled;
   }
 }
