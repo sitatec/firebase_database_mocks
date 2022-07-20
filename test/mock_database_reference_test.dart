@@ -1,6 +1,5 @@
 import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:firebase_database_mocks/src/mock_database_reference.dart';
-import 'package:firebase_database_mocks/src/set_up_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -19,7 +18,7 @@ void main() {
     });
     test("Should get reference using the deprecated reference() method", () {
       expect(
-        MockFirebaseDatabase.instance.reference().child("deprecated").path,
+        MockFirebaseDatabase.instance.ref().child("deprecated").path,
         MockDatabaseReference().child("deprecated").path,
       );
     });
