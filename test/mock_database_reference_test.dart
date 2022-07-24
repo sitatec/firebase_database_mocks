@@ -18,7 +18,7 @@ void main() {
     });
     test("Should get reference using the deprecated reference() method", () {
       expect(
-        MockFirebaseDatabase.instance.ref().child("deprecated").path,
+        MockFirebaseDatabase.instance.reference().child("deprecated").path,
         MockDatabaseReference().child("deprecated").path,
       );
     });
