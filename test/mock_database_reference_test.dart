@@ -1,6 +1,5 @@
 import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:firebase_database_mocks/src/mock_database_reference.dart';
-import 'package:firebase_database_mocks/src/set_up_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
