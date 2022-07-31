@@ -1,6 +1,7 @@
 # firebase_database_mocks
 
-[![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks)  [![test: passing](https://github.com/sitatec/firebase_database_mocks/actions/workflows/main.yml/badge.svg)](https://github.com/sitatec/firebase_database_mocks/actions) [![codecov](https://codecov.io/gh/sitatec/firebase_database_mocks/branch/main/graph/badge.svg?token=YLBE21OXGR)](https://codecov.io/gh/sitatec/firebase_database_mocks) [![style: effective dart](https://img.shields.io/badge/style-pedantic-blue)](https://github.com/google/pedantic)
+[![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks)  [![test: passing](https://github.com/sitatec/firebase_database_mocks/actions/workflows/main.yml/badge.svg)](https://github.com/sitatec/firebase_database_mocks/actions) [![codecov](https://codecov.io/gh/sitatec/firebase_database_mocks/branch/main/graph/badge.svg?token=YLBE21OXGR)](https://codecov.io/gh/sitatec/firebase_database_mocks) 
+[![style: effective dart](https://img.shields.io/badge/style-flutter--lint-blue)](https://pub.dev/packages/flutter_lints)
 
 A Library that make it easy to write unit tests for FirebaseDatabase (real-time database).
 
