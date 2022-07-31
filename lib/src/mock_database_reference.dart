@@ -7,10 +7,13 @@ import 'mock_firebase_database.dart';
 
 class MockDatabaseReference extends Mock implements DatabaseReference {
   var _nodePath = '/';
+
   // ignore: prefer_final_fields
   static Map<String, dynamic>? _persistedData = <String, dynamic>{};
   Map<String, dynamic>? _volatileData = <String, dynamic>{};
+
   MockDatabaseReference();
+
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
   }
@@ -35,7 +38,12 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   }
 
   @override
-  String? get key => _nodePath == '/' ? null : _nodePath.split('/').last;
+  String? get key {
+    if (_nodePath == '/') {
+      return null;
+    }
+    return _nodePath.substring(1, _nodePath.length - 1).split('/').last;
+  }
 
   @override
   String get path => _nodePath;
@@ -152,12 +160,11 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   Future<DatabaseEvent> once(
       [DatabaseEventType eventType = DatabaseEventType.value]) {
     var tempData = _getCurrentData();
-    return Future.value(
-        MockDatabaseEvent(MockDataSnapshot(this, tempData)));
+    return Future.value(MockDatabaseEvent(MockDataSnapshot(this, tempData)));
   }
 
   @override
-  Future<DataSnapshot> get(){
+  Future<DataSnapshot> get() {
     var tempData = _getCurrentData();
     return Future.value(MockDataSnapshot(this, tempData));
   }
@@ -165,13 +172,14 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
 class _Int {
   int value;
+
   _Int(this.value);
+
   _Int increment() {
     ++value;
     return this;
   }
 }
-
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
 //   var _dataWithGenericValue = {'__generic_mock_data_value__': Object()};

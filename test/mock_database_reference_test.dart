@@ -267,6 +267,18 @@ void main() {
     expect((await stream.first).snapshot.value, equals('StreamVal'));
   });
 
+  group('Node key', () {
+    test('Should return null for root reference', () {
+      expect(databaseReference.key, isNull);
+    });
+
+    test('Should return last part of path as key', () {
+      expect(databaseReference.child('foo').key, equals('foo'));
+      expect(databaseReference.child('foo/bar').key, equals('bar'));
+      expect(databaseReference.child('foo/bar/baz').key, equals('baz'));
+    });
+  });
+
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.
 
   // test(
