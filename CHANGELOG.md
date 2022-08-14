@@ -1,7 +1,9 @@
-## 0.3.3
+## 0.4.0
 * Fixed setting up mocks with the new firebase_core_platform_interface version
 * Updated dependencies
 * Fix some lint issues
+* Implement `get` method for `MockDatabaseReference`
+Thanks to Zohenn and OlegNovosad for their PRs
 ## 0.3.2
 * fix and test MockFirebaseDatabase.instance.ref()
 ## 0.3.1
