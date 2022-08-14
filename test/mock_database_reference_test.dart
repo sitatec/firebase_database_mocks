@@ -67,6 +67,11 @@ void main() {
         isNull,
       );
     });
+    test('Should set exists based on whether data exists at given path', () async {
+      await databaseReference.child('existing_path').set('value');
+      expect((await databaseReference.child('existing_path').get()).exists, isTrue);
+      expect((await databaseReference.child('foobar').get()).exists, isFalse);
+    });
 
     group('Should return null when a nonexistent path that', () {
       test('starts with existent node path is given', () async {
@@ -206,11 +211,11 @@ void main() {
 
   group('Data persistence : ', () {
     tearDown(() {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: true);
     });
 
     test('Should persist data while test running', () async {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: true);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: true);
       MockDatabaseReference? _databaseReference = MockDatabaseReference();
       await _databaseReference.child('test1').set('value1');
       await _databaseReference.child('test2/test2').set('value2');
@@ -236,7 +241,7 @@ void main() {
       );
     });
     test('Should not persist data', () async {
-      MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);
+      MockFirebaseDatabase.setDataPersistenceEnabled(enabled: false);
       await databaseReference.child('test_').set('snapshot.value');
       expect(
         (await databaseReference.child('test_').once()).snapshot.value,
@@ -259,6 +264,18 @@ void main() {
     await databaseReference.child('streamTest').set('StreamVal');
     final stream = databaseReference.child('streamTest').onValue;
     expect((await stream.first).snapshot.value, equals('StreamVal'));
+  });
+
+  group('Node key', () {
+    test('Should return null for root reference', () {
+      expect(databaseReference.key, isNull);
+    });
+
+    test('Should return last part of path as key', () {
+      expect(databaseReference.child('foo').key, equals('foo'));
+      expect(databaseReference.child('foo/bar').key, equals('bar'));
+      expect(databaseReference.child('foo/bar/baz').key, equals('baz'));
+    });
   });
 
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.

@@ -7,10 +7,13 @@ import 'mock_firebase_database.dart';
 
 class MockDatabaseReference extends Mock implements DatabaseReference {
   var _nodePath = '/';
+
   // ignore: prefer_final_fields
-  static Map<String, dynamic>? _persitedData = <String, dynamic>{};
+  static Map<String, dynamic>? _persistedData = <String, dynamic>{};
   Map<String, dynamic>? _volatileData = <String, dynamic>{};
+
   MockDatabaseReference();
+
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
   }
@@ -22,16 +25,24 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   Map<String, dynamic>? get _data {
     if (MockFirebaseDatabase.persistData) {
-      return _persitedData;
+      return _persistedData;
     }
     return _volatileData;
   }
 
   set _data(data) {
     if (MockFirebaseDatabase.persistData) {
-      _persitedData = data;
+      _persistedData = data;
     } else
       return _volatileData = data;
+  }
+
+  @override
+  String? get key {
+    if (_nodePath == '/') {
+      return null;
+    }
+    return _nodePath.substring(1, _nodePath.length - 1).split('/').last;
   }
 
   @override
@@ -122,11 +133,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     );
   }
 
-  @override
-
-  /// __WARNING!__ For now only the DatabaseEventType.value event is supported.
-  Future<DatabaseEvent> once(
-      [DatabaseEventType eventType = DatabaseEventType.value]) {
+  dynamic _getCurrentData() {
     var tempData = _data;
     // remove start and end slashes.
     var nodePath = _nodePath.substring(1, _nodePath.length - 1);
@@ -143,20 +150,36 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
         }
       }
     }
-    return Future.value(
-        MockDatabaseEvent(MockDataSnapshot(tempData![nodePath])));
+
+    return tempData![nodePath];
+  }
+
+  @override
+
+  /// __WARNING!__ For now only the DatabaseEventType.value event is supported.
+  Future<DatabaseEvent> once(
+      [DatabaseEventType eventType = DatabaseEventType.value]) {
+    var tempData = _getCurrentData();
+    return Future.value(MockDatabaseEvent(MockDataSnapshot(this, tempData)));
+  }
+
+  @override
+  Future<DataSnapshot> get() {
+    var tempData = _getCurrentData();
+    return Future.value(MockDataSnapshot(this, tempData));
   }
 }
 
 class _Int {
   int value;
+
   _Int(this.value);
+
   _Int increment() {
     ++value;
     return this;
   }
 }
-
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
 //   var _dataWithGenericValue = {'__generic_mock_data_value__': Object()};
