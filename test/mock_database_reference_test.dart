@@ -300,6 +300,13 @@ void main() {
 
       expect(reference1.key, isNot(reference2.key));
     });
+
+    test('Should sort keys lexicographically', () {
+      final reference1 = reference.push();
+      final reference2 = reference.push();
+
+      expect(reference1.key!.compareTo(reference2.key!), lessThan(0));
+    });
   });
 
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.
