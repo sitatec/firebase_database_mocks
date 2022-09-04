@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database_mocks/firebase_database_mocks.dart';
 import 'package:firebase_database_mocks/src/mock_database_reference.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,9 +68,11 @@ void main() {
         isNull,
       );
     });
-    test('Should set exists based on whether data exists at given path', () async {
+    test('Should set exists based on whether data exists at given path',
+        () async {
       await databaseReference.child('existing_path').set('value');
-      expect((await databaseReference.child('existing_path').get()).exists, isTrue);
+      expect((await databaseReference.child('existing_path').get()).exists,
+          isTrue);
       expect((await databaseReference.child('foobar').get()).exists, isFalse);
     });
 
@@ -275,6 +278,34 @@ void main() {
       expect(databaseReference.child('foo').key, equals('foo'));
       expect(databaseReference.child('foo/bar').key, equals('bar'));
       expect(databaseReference.child('foo/bar/baz').key, equals('baz'));
+    });
+  });
+
+  group('push', () {
+    late DatabaseReference reference;
+
+    setUp(() {
+      reference = databaseReference.child('push');
+    });
+
+    test('Should return key of length 20', () {
+      final newReference = reference.push();
+
+      expect(newReference.key, hasLength(20));
+    });
+
+    test('Should return different keys if pushed at the same time', () {
+      final reference1 = reference.push();
+      final reference2 = reference.push();
+
+      expect(reference1.key, isNot(reference2.key));
+    });
+
+    test('Should sort keys lexicographically', () {
+      final reference1 = reference.push();
+      final reference2 = reference.push();
+
+      expect(reference1.key!.compareTo(reference2.key!), lessThan(0));
     });
   });
 

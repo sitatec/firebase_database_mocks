@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database_mocks/src/mock_database_event.dart';
+import 'package:firebase_database_mocks/src/util.dart';
 import 'package:mockito/mockito.dart';
 
 import 'mock_data_snapshot.dart';
@@ -56,6 +57,12 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
       path,
       _data,
     );
+  }
+
+  @override
+  DatabaseReference push() {
+    final id = nextPushId(DateTime.now().millisecondsSinceEpoch);
+    return child(id);
   }
 
   @override

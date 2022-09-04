@@ -3,17 +3,17 @@
 [![Pub Version](https://img.shields.io/pub/v/firebase_database_mocks)](https://pub.dev/packages/firebase_database_mocks)  [![test: passing](https://github.com/sitatec/firebase_database_mocks/actions/workflows/main.yml/badge.svg)](https://github.com/sitatec/firebase_database_mocks/actions) [![codecov](https://codecov.io/gh/sitatec/firebase_database_mocks/branch/main/graph/badge.svg?token=YLBE21OXGR)](https://codecov.io/gh/sitatec/firebase_database_mocks) 
 [![style: effective dart](https://img.shields.io/badge/style-flutter--lint-blue)](https://pub.dev/packages/flutter_lints)
 
-A Library that make it easy to write unit tests for FirebaseDatabase (real-time database).
+A library that makes it easy to write unit tests for FirebaseDatabase ([Realtime Database](https://firebase.google.com/docs/database?hl=en)).
 
 ## Usage
-Get an Instance of `MockFirebaseDatabase` like this : `MockFirebaseDatabase.instance`, then use it in your tests as if it was the reel
+Get an instance of `MockFirebaseDatabase` like this : `MockFirebaseDatabase.instance`, then use it in your tests as if it was the real
 `FirebaseDatabase.instance`. 
 
-By default the library keeps the data in memory as long as the tests are running, but you can disable the data persistance as follow: 
-`MockFirebaseDatabase.setDataPersistanceEnabled(ennabled: false);`.
+By default the library keeps the data in memory as long as the tests are running, but you can disable the data persistence as follow: 
+`MockFirebaseDatabase.setDataPersistenceEnabled(ennabled: false);`.
 
-If the data persistance is disabled, each time you create an instance of `MockDatabaseReference` either by using the constructor: `MockDatabaseReference()`, or by geting the root reference on `MockFirebaseDatabase` instance : `MockFirebaseDatabase.instance.reference()` a new data store is created instead of using the cached one.
-> ___Note:___ The `MockFirebaseDatabase.setDataPersistanceEnabled()` function is currently experimental, so you might face some issues when you disable the data persitance.
+If the data persistence is disabled, each time you create an instance of `MockDatabaseReference` either by using the constructor: `MockDatabaseReference()`, or by getting the root reference on `MockFirebaseDatabase` instance : `MockFirebaseDatabase.instance.ref()` a new data store is created instead of using the cached one.
+> ___Note:___ The `MockFirebaseDatabase.setDataPersistenceEnabled()` function is currently experimental, so you might face some issues when you disable the data persitence.
 
 ### Code Sample
 ```dart
@@ -84,13 +84,32 @@ void main() {
 
 ```
 
-As you can see you don't need to initialize firabase core for testing or call
-`TestWidgetsFlutterBinding.ensureInitialized()` before using `MockFirebaseDatabase`
-but in bonus if you use another firebase service that needs it, you can simply call
+As you can see you don't need to initialize firebase core for testing or call
+`TestWidgetsFlutterBinding.ensureInitialized()` before using `MockFirebaseDatabase`,
+but if you use another firebase service that needs it, you can simply call
 the `setupFirebaseMocks()` top level function which performs all required operations 
 for testing a firebase service that isn't fully mocked.
 
+### Supported getters/methods
+- ```MockFirebaseDatabase```
+    - ```ref()```
+    - ```reference()```
+- ```MockDatabaseReference```
+    - ```key```
+    - ```path```
+    - ```child()```
+    - ```get()```
+    - ```set()```
+    - ```once()``` (```DatabaseEventType.value``` only)
+    - ```push()```
+- ```MockDataSnapshot```
+    - ```key```
+    - ```ref```
+    - ```value```
+    - ```exists```
 
+
+### Contributing
 - [Issues](https://github.com/sitatec/firebase_database_mocks/issues)
 - [Pull requests](https://github.com/sitatec/firebase_database_mocks/pulls)
 
