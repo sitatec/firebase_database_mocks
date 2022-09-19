@@ -98,7 +98,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
       _baseData = _baseData[key]!;
     }
 
-    for(var _key in value.keys){
+    for (var _key in value.keys) {
       final segments = _key.split('/');
       final innerKey = segments.isNotEmpty ? segments.last : _key;
       final _data = _getDataHandle(_key, _baseData, true)!;
@@ -120,10 +120,10 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   }
 
   String _trimSlashes(String path) {
-    if(path.startsWith('/')){
+    if (path.startsWith('/')) {
       path = path.substring(1);
     }
-    if(path.endsWith('/')){
+    if (path.endsWith('/')) {
       path = path.substring(0, path.length - 1);
     }
     return path;
