@@ -107,18 +107,22 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     }
   }
 
-  /// Recursively converts Maps into Map<String, dynamic>, so it is possible to change type later.
+  /// Recursively converts Maps into Map<String, dynamic>,
+  /// so it is possible to change type later.
   dynamic _parseValue(dynamic value) {
     if (value is Map) {
       // todo: check if keys contain forbidden characters: '/', '.', '#', '$', '[', or ']'
       // additionally, in case of update '/' should be allowed
-      return Map.fromEntries(value.entries
-          .map((e) => MapEntry(e.key.toString(), _parseValue(e.value))));
+      return Map.fromEntries(
+        value.entries
+            .map((e) => MapEntry(e.key.toString(), _parseValue(e.value))),
+      );
     }
 
     return value;
   }
 
+  /// Removes slashes from start and end of given path.
   String _trimSlashes(String path) {
     if (path.startsWith('/')) {
       path = path.substring(1);
@@ -129,14 +133,24 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return path;
   }
 
-  Map<String, dynamic>? _getDataHandle(String path, Map<String, dynamic>? data,
-      [bool createIfMissing = false]) {
+  /// Gets the map containing value for given path,
+  /// e.g. given the path foo/bar/baz it returns the map at foo/bar,
+  /// which you can then use to access value at baz.
+  /// If createIfMissing is set to true and nested map will not be found,
+  /// it will be created, so null won't be returned.
+  Map<String, dynamic>? _getDataHandle(
+    String path,
+    Map<String, dynamic>? data, [
+    bool createIfMissing = false,
+  ]) {
     path = _trimSlashes(path);
     final pathSegments = path.split('/');
     if (pathSegments.length == 1) {
+      // nothing to traverse
       return data;
     }
 
+    // The caller will access the value at key.
     final segmentsWithoutKey = pathSegments.take(pathSegments.length - 1);
     Map<String, dynamic>? _data = data;
     for (var segment in segmentsWithoutKey) {
@@ -199,17 +213,6 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   @override
   Future<void> remove() => set(null);
-}
-
-class _Int {
-  int value;
-
-  _Int(this.value);
-
-  _Int increment() {
-    ++value;
-    return this;
-  }
 }
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
