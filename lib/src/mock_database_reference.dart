@@ -43,7 +43,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     if (_nodePath == '/') {
       return null;
     }
-    return _nodePath.substring(1, _nodePath.length - 1).split('/').last;
+    return _trimSlashes(_nodePath).split('/').last;
   }
 
   @override
@@ -83,43 +83,6 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     } else {
       data![key!] = value;
     }
-
-    return;
-
-    if (_nodePath == '/') {
-      _data = value;
-    } else {
-      var nodePathWithoutSlashesAtEndAndStart =
-          _nodePath.substring(1, _nodePath.length - 1);
-      var nodesList = nodePathWithoutSlashesAtEndAndStart.split('/');
-      Map<String, dynamic>? tempData = <String, dynamic>{};
-      Map<String, dynamic>? lastNodeInCurrentData;
-      var nodeIndexReference = _Int(0);
-      if (_data![nodesList.first] == null) {
-        lastNodeInCurrentData = _data;
-      } else {
-        lastNodeInCurrentData = _getNextNodeData(
-            data: _data, nodesList: nodesList, nodeIndex: nodeIndexReference);
-      }
-      var nodeIndex = nodeIndexReference.value;
-      var noNewNodeToAdd = nodesList.length <= nodeIndex;
-      if (noNewNodeToAdd) {
-        lastNodeInCurrentData![nodesList.last] = value;
-      } else {
-        var firstNodeInNewData = nodesList[nodeIndex++];
-        if (nodeIndex < nodesList.length) {
-          tempData = _buildNewNodesTree(
-            nodeIndex: nodeIndex,
-            nodesList: nodesList,
-            data: tempData,
-            value: value,
-          );
-          lastNodeInCurrentData!.addAll({firstNodeInNewData: tempData});
-        } else {
-          lastNodeInCurrentData!.addAll({firstNodeInNewData: value});
-        }
-      }
-    }
   }
 
   @override
@@ -156,7 +119,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return value;
   }
 
-  String _removeSlashes(String path) {
+  String _trimSlashes(String path) {
     if(path.startsWith('/')){
       path = path.substring(1);
     }
@@ -168,7 +131,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   Map<String, dynamic>? _getDataHandle(String path, Map<String, dynamic>? data,
       [bool createIfMissing = false]) {
-    path = _removeSlashes(path);
+    path = _trimSlashes(path);
     final pathSegments = path.split('/');
     if (pathSegments.length == 1) {
       return data;
@@ -195,49 +158,13 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return _data;
   }
 
-  Map<String, dynamic>? _buildNewNodesTree({
-    required dynamic data,
-    required List<String> nodesList,
-    required int nodeIndex,
-    required value,
-  }) {
-    var nextNodeIndex = nodeIndex + 1;
-    if (nodeIndex + 1 < nodesList.length) {
-      data[nodesList[nodeIndex]] = {nodesList[nextNodeIndex]: Object()};
-      _buildNewNodesTree(
-          data: data[nodesList[nodeIndex]],
-          nodesList: nodesList,
-          nodeIndex: nextNodeIndex,
-          value: value);
-    } else
-      data[nodesList[nodeIndex]] = value;
-    return data;
-  }
-
-  _getNextNodeData({
-    required dynamic data,
-    required List<String> nodesList,
-    required _Int nodeIndex,
-  }) {
-    if (nodesList.length <= nodeIndex.value ||
-        !(data[nodesList[nodeIndex.value]] is Map)) {
-      nodeIndex.increment();
-      return data;
-    }
-    return _getNextNodeData(
-      data: data[nodesList[nodeIndex.value]],
-      nodesList: nodesList,
-      nodeIndex: nodeIndex.increment(),
-    );
-  }
-
   dynamic _getCurrentData() {
     if (_nodePath == '/') {
       return _data;
     }
     var tempData = _data;
     // remove start and end slashes.
-    var nodePath = _nodePath.substring(1, _nodePath.length - 1);
+    var nodePath = _trimSlashes(_nodePath);
     var nodeList = nodePath.split('/');
     if (nodeList.length > 1) {
       for (var i = 0; i < nodeList.length; i++) {

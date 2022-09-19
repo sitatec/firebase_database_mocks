@@ -7,6 +7,7 @@ void main() {
   late DatabaseReference databaseReference;
   setUp(() {
     setupFirebaseMocks(); // Just to make sure it that no exception is thrown.
+    MockFirebaseDatabase.setDataPersistenceEnabled(enabled: false);
     databaseReference = MockFirebaseDatabase.instance.ref();
   });
 
@@ -373,6 +374,19 @@ void main() {
         }),
       );
     });
+
+    test('should work on root reference', () async {
+      await databaseReference.update({
+        'update': 'foo',
+      });
+      final snapshot = await databaseReference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'update': 'foo',
+        }),
+      );
+    });
   });
 
   group('push', () {
@@ -424,14 +438,34 @@ void main() {
 
     test('should remove shallow data', () async {
       await shallowReference.remove();
-      final snapshot = await shallowReference.get();
-      expect(snapshot.exists, isFalse);
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'nested': {
+            'foo': {
+              'bar': 'baz',
+            },
+          },
+        }),
+      );
     });
 
     test('should remove nested data', () async {
       await nestedReference.remove();
-      final snapshot = await nestedReference.get();
-      expect(snapshot.exists, isFalse);
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'shallow': 'data',
+        }),
+      );
+    });
+
+    test('should work on root reference', () async {
+      await databaseReference.remove();
+      final snapshot = await databaseReference.get();
+      expect(snapshot.value, isNull);
     });
 
     // todo: uncomment when fixed
