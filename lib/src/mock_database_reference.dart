@@ -122,6 +122,28 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     }
   }
 
+  @override
+  Future<void> update(Map<String, Object?> value) async {
+    value = _parseValue(value);
+    Map<String, dynamic> _baseData = _getDataHandle(_nodePath, _data, true)!;
+
+    if (key != null && _baseData[key] == null) {
+      _baseData[key!] = <String, dynamic>{};
+    }
+
+    if (key != null) {
+      _baseData = _baseData[key]!;
+    }
+
+    for(var _key in value.keys){
+      final segments = _key.split('/');
+      final innerKey = segments.isNotEmpty ? segments.last : _key;
+      final _data = _getDataHandle(_key, _baseData, true)!;
+
+      _data[innerKey] = value[_key];
+    }
+  }
+
   /// Recursively converts Maps into Map<String, dynamic>, so it is possible to change type later.
   dynamic _parseValue(dynamic value) {
     if (value is Map) {
@@ -134,11 +156,19 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return value;
   }
 
+  String _removeSlashes(String path) {
+    if(path.startsWith('/')){
+      path = path.substring(1);
+    }
+    if(path.endsWith('/')){
+      path = path.substring(0, path.length - 1);
+    }
+    return path;
+  }
+
   Map<String, dynamic>? _getDataHandle(String path, Map<String, dynamic>? data,
       [bool createIfMissing = false]) {
-    if (path.length > 1) {
-      path = path.substring(1, path.length - 1);
-    }
+    path = _removeSlashes(path);
     final pathSegments = path.split('/');
     if (pathSegments.length == 1) {
       return data;
@@ -240,6 +270,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return Future.value(MockDataSnapshot(this, tempData));
   }
 
+  @override
   Future<void> remove() => set(null);
 }
 

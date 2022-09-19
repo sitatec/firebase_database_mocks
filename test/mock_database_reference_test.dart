@@ -283,6 +283,98 @@ void main() {
     });
   });
 
+  group('update', () {
+    late DatabaseReference reference;
+
+    setUp(() async {
+      reference = databaseReference.child('update');
+      await reference.set({
+        'shallow': 'data',
+        'nested': {
+          'foo': {
+            'bar': 'baz',
+          },
+        },
+      });
+    });
+
+    test('should update shallow data', () async {
+      await reference.update({'shallow': 'foo'});
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'shallow': 'foo',
+          'nested': {
+            'foo': {
+              'bar': 'baz',
+            },
+          },
+        }),
+      );
+    });
+
+    test('should update nested data', () async {
+      await reference.update({
+        'nested': {
+          'foo': {'bar': 'foo'}
+        }
+      });
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'shallow': 'data',
+          'nested': {
+            'foo': {
+              'bar': 'foo',
+            },
+          },
+        }),
+      );
+    });
+
+    test('should update many locations simultaneously', () async {
+      await reference.update({
+        'shallow': 'foo',
+        'nested': {
+          'foo': {'bar': 'foo'}
+        }
+      });
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'shallow': 'foo',
+          'nested': {
+            'foo': {
+              'bar': 'foo',
+            },
+          },
+        }),
+      );
+    });
+
+    test('should work with slash separated keys', () async {
+      await reference.update({
+        'shallow': 'foo',
+        'nested/foo/bar': 'foo',
+      });
+      final snapshot = await reference.get();
+      expect(
+        snapshot.value,
+        equals({
+          'shallow': 'foo',
+          'nested': {
+            'foo': {
+              'bar': 'foo',
+            },
+          },
+        }),
+      );
+    });
+  });
+
   group('push', () {
     late DatabaseReference reference;
 
