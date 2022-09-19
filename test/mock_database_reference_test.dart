@@ -4,10 +4,10 @@ import 'package:firebase_database_mocks/src/mock_database_reference.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late MockDatabaseReference databaseReference;
+  late DatabaseReference databaseReference;
   setUp(() {
     setupFirebaseMocks(); // Just to make sure it that no exception is thrown.
-    databaseReference = MockDatabaseReference();
+    databaseReference = MockFirebaseDatabase.instance.ref();
   });
 
   group('Node path handling : ', () {
@@ -35,7 +35,7 @@ void main() {
         equals(MockDatabaseReference().child('test').path),
       );
     });
-    test('Should work with slash as suffix', () {
+    test('Should work with slash as prefix and suffix', () {
       expect(
         databaseReference.child('/test/').path,
         equals(MockDatabaseReference().child('test').path),
@@ -258,7 +258,7 @@ void main() {
         equals('otherValue'),
       );
       expect(
-          (await MockDatabaseReference().child('test_').once()).snapshot.value,
+          (await MockFirebaseDatabase().ref().child('test_').once()).snapshot.value,
           isNull);
     });
   });
