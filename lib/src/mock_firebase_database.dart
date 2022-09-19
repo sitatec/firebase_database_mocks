@@ -6,15 +6,18 @@ import 'mock_database_reference.dart';
 class MockFirebaseDatabase extends Mock implements FirebaseDatabase {
   static FirebaseDatabase get instance => MockFirebaseDatabase();
   static get persistData => _persistData;
+
+  Map<String, dynamic> _volatileData = <String, dynamic>{};
+
   @override
   DatabaseReference reference() => ref();
 
   @override
   DatabaseReference ref([String? path]) {
     if (path != null) {
-      return MockDatabaseReference().child(path);
+      return MockDatabaseReference(_volatileData).child(path);
     }
-    return MockDatabaseReference();
+    return MockDatabaseReference(_volatileData);
   }
 
   // ignore: unused_field

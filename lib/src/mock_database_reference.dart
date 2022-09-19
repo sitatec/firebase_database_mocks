@@ -11,9 +11,9 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   // ignore: prefer_final_fields
   static Map<String, dynamic>? _persistedData = <String, dynamic>{};
-  Map<String, dynamic>? _volatileData = <String, dynamic>{};
+  Map<String, dynamic>? _volatileData;
 
-  MockDatabaseReference();
+  MockDatabaseReference([this._volatileData]);
 
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
