@@ -144,7 +144,7 @@ void main() {
     });
 
     test('Should set data in nested nodes', () async {
-      databaseReference
+      await databaseReference
           .child('path_')
           .child('mock_')
           .child('test_')
@@ -222,7 +222,7 @@ void main() {
       MockDatabaseReference? _databaseReference = MockDatabaseReference();
       await _databaseReference.child('test1').set('value1');
       await _databaseReference.child('test2/test2').set('value2');
-      await _databaseReference.child('test1/test_one').set('value3');
+      await _databaseReference.child('test3/test_one').set('value3');
       _databaseReference = null;
       expect(_databaseReference, isNull);
 
@@ -237,7 +237,7 @@ void main() {
         equals('value2'),
       );
       expect(
-        (await newDatabaseReference.child('test1/test_one').once())
+        (await newDatabaseReference.child('test3/test_one').once())
             .snapshot
             .value,
         equals('value3'),
@@ -258,7 +258,9 @@ void main() {
         equals('otherValue'),
       );
       expect(
-          (await MockFirebaseDatabase().ref().child('test_').once()).snapshot.value,
+          (await MockFirebaseDatabase().ref().child('test_').once())
+              .snapshot
+              .value,
           isNull);
     });
   });
@@ -307,6 +309,46 @@ void main() {
 
       expect(reference1.key!.compareTo(reference2.key!), lessThan(0));
     });
+  });
+
+  group('remove', () {
+    late DatabaseReference reference;
+    late DatabaseReference shallowReference;
+    late DatabaseReference nestedReference;
+
+    setUp(() async {
+      reference = databaseReference.child('remove');
+      await reference.set({
+        'shallow': 'data',
+        'nested': {
+          'foo': {
+            'bar': 'baz',
+          },
+        },
+      });
+      shallowReference = reference.child('shallow');
+      nestedReference = reference.child('nested');
+    });
+
+    test('should remove shallow data', () async {
+      await shallowReference.remove();
+      final snapshot = await shallowReference.get();
+      expect(snapshot.exists, isFalse);
+    });
+
+    test('should remove nested data', () async {
+      await nestedReference.remove();
+      final snapshot = await nestedReference.get();
+      expect(snapshot.exists, isFalse);
+    });
+
+    // todo: uncomment when fixed
+    // test('should remove whole map if its only key is removed', () async {
+    //   await nestedReference.child('foo/bar').remove();
+    //   final snapshot = await nestedReference.get();
+    //   print(snapshot.value);
+    //   expect(snapshot.exists, isFalse);
+    // });
   });
 
   // Todo implement all dataSnapshot, dbReference and fbDatabase getters and setters if possible.

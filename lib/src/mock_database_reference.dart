@@ -67,6 +67,25 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   @override
   Future<void> set(dynamic value, {dynamic priority}) async {
+    value = _parseValue(value);
+
+    if (_nodePath == '/') {
+      _data = value;
+      return;
+    }
+
+    final data = _getDataHandle(_nodePath, _data, value != null);
+    // todo: if null value is set on the only key of a Map, the map itself should be deleted
+    // example:
+    // { test: { a: { b: 1 } } }, removing b from test/a should remove test completely
+    if (value == null) {
+      data!.remove(key);
+    } else {
+      data![key!] = value;
+    }
+
+    return;
+
     if (_nodePath == '/') {
       _data = value;
     } else {
@@ -97,11 +116,53 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
           );
           lastNodeInCurrentData!.addAll({firstNodeInNewData: tempData});
         } else {
-          if (value is Map) value = value;
           lastNodeInCurrentData!.addAll({firstNodeInNewData: value});
         }
       }
     }
+  }
+
+  /// Recursively converts Maps into Map<String, dynamic>, so it is possible to change type later.
+  dynamic _parseValue(dynamic value) {
+    if (value is Map) {
+      // todo: check if keys contain forbidden characters: '/', '.', '#', '$', '[', or ']'
+      // additionally, in case of update '/' should be allowed
+      return Map.fromEntries(value.entries
+          .map((e) => MapEntry(e.key.toString(), _parseValue(e.value))));
+    }
+
+    return value;
+  }
+
+  Map<String, dynamic>? _getDataHandle(String path, Map<String, dynamic>? data,
+      [bool createIfMissing = false]) {
+    if (path.length > 1) {
+      path = path.substring(1, path.length - 1);
+    }
+    final pathSegments = path.split('/');
+    if (pathSegments.length == 1) {
+      return data;
+    }
+
+    final segmentsWithoutKey = pathSegments.take(pathSegments.length - 1);
+    Map<String, dynamic>? _data = data;
+    for (var segment in segmentsWithoutKey) {
+      if (_data == null) {
+        if (createIfMissing) {
+          _data = <String, dynamic>{};
+        } else {
+          break;
+        }
+      }
+
+      if (_data[segment] == null && createIfMissing) {
+        _data[segment] = <String, dynamic>{};
+      }
+
+      _data = _data[segment];
+    }
+
+    return _data;
   }
 
   Map<String, dynamic>? _buildNewNodesTree({
@@ -141,6 +202,9 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
   }
 
   dynamic _getCurrentData() {
+    if (_nodePath == '/') {
+      return _data;
+    }
     var tempData = _data;
     // remove start and end slashes.
     var nodePath = _nodePath.substring(1, _nodePath.length - 1);
@@ -175,6 +239,8 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     var tempData = _getCurrentData();
     return Future.value(MockDataSnapshot(this, tempData));
   }
+
+  Future<void> remove() => set(null);
 }
 
 class _Int {
