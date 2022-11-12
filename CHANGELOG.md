@@ -1,3 +1,6 @@
+## 0.5.0
+* Implement update and remove methods for MockDatabaseReference (Thanks Zohenn)
+* Added Support for firebase_database 10.0.2 (Thansk @Seyun)
 ## 0.4.0
 * Fixed setting up mocks with the new firebase_core_platform_interface version
 * Updated dependencies
