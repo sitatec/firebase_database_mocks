@@ -11,9 +11,9 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   // ignore: prefer_final_fields
   static Map<String, dynamic>? _persistedData = <String, dynamic>{};
-  Map<String, dynamic>? _volatileData = <String, dynamic>{};
+  Map<String, dynamic>? _volatileData;
 
-  MockDatabaseReference();
+  MockDatabaseReference([this._volatileData]);
 
   MockDatabaseReference._(nodePath, [this._volatileData]) {
     _nodePath += nodePath;
@@ -43,7 +43,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     if (_nodePath == '/') {
       return null;
     }
-    return _nodePath.substring(1, _nodePath.length - 1).split('/').last;
+    return _trimSlashes(_nodePath).split('/').last;
   }
 
   @override
@@ -67,83 +67,118 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   @override
   Future<void> set(dynamic value, {dynamic priority}) async {
+    value = _parseValue(value);
+
     if (_nodePath == '/') {
       _data = value;
+      return;
+    }
+
+    final data = _getDataHandle(_nodePath, _data, value != null);
+    // todo: if null value is set on the only key of a Map, the map itself should be deleted
+    // example:
+    // { test: { a: { b: 1 } } }, removing b from test/a should remove test completely
+    if (value == null) {
+      data!.remove(key);
     } else {
-      var nodePathWithoutSlashesAtEndAndStart =
-          _nodePath.substring(1, _nodePath.length - 1);
-      var nodesList = nodePathWithoutSlashesAtEndAndStart.split('/');
-      Map<String, dynamic>? tempData = <String, dynamic>{};
-      Map<String, dynamic>? lastNodeInCurrentData;
-      var nodeIndexReference = _Int(0);
-      if (_data![nodesList.first] == null) {
-        lastNodeInCurrentData = _data;
-      } else {
-        lastNodeInCurrentData = _getNextNodeData(
-            data: _data, nodesList: nodesList, nodeIndex: nodeIndexReference);
-      }
-      var nodeIndex = nodeIndexReference.value;
-      var noNewNodeToAdd = nodesList.length <= nodeIndex;
-      if (noNewNodeToAdd) {
-        lastNodeInCurrentData![nodesList.last] = value;
-      } else {
-        var firstNodeInNewData = nodesList[nodeIndex++];
-        if (nodeIndex < nodesList.length) {
-          tempData = _buildNewNodesTree(
-            nodeIndex: nodeIndex,
-            nodesList: nodesList,
-            data: tempData,
-            value: value,
-          );
-          lastNodeInCurrentData!.addAll({firstNodeInNewData: tempData});
-        } else {
-          if (value is Map) value = value;
-          lastNodeInCurrentData!.addAll({firstNodeInNewData: value});
-        }
-      }
+      data![key!] = value;
     }
   }
 
-  Map<String, dynamic>? _buildNewNodesTree({
-    required dynamic data,
-    required List<String> nodesList,
-    required int nodeIndex,
-    required value,
-  }) {
-    var nextNodeIndex = nodeIndex + 1;
-    if (nodeIndex + 1 < nodesList.length) {
-      data[nodesList[nodeIndex]] = {nodesList[nextNodeIndex]: Object()};
-      _buildNewNodesTree(
-          data: data[nodesList[nodeIndex]],
-          nodesList: nodesList,
-          nodeIndex: nextNodeIndex,
-          value: value);
-    } else
-      data[nodesList[nodeIndex]] = value;
-    return data;
+  @override
+  Future<void> update(Map<String, Object?> value) async {
+    value = _parseValue(value);
+    Map<String, dynamic> _baseData = _getDataHandle(_nodePath, _data, true)!;
+
+    if (key != null && _baseData[key] == null) {
+      _baseData[key!] = <String, dynamic>{};
+    }
+
+    if (key != null) {
+      _baseData = _baseData[key]!;
+    }
+
+    for (var _key in value.keys) {
+      final segments = _key.split('/');
+      final innerKey = segments.isNotEmpty ? segments.last : _key;
+      final _data = _getDataHandle(_key, _baseData, true)!;
+
+      _data[innerKey] = value[_key];
+    }
   }
 
-  _getNextNodeData({
-    required dynamic data,
-    required List<String> nodesList,
-    required _Int nodeIndex,
-  }) {
-    if (nodesList.length <= nodeIndex.value ||
-        !(data[nodesList[nodeIndex.value]] is Map)) {
-      nodeIndex.increment();
+  /// Recursively converts Maps into Map<String, dynamic>,
+  /// so it is possible to change type later.
+  dynamic _parseValue(dynamic value) {
+    if (value is Map) {
+      // todo: check if keys contain forbidden characters: '/', '.', '#', '$', '[', or ']'
+      // additionally, in case of update '/' should be allowed
+      return Map.fromEntries(
+        value.entries
+            .map((e) => MapEntry(e.key.toString(), _parseValue(e.value))),
+      );
+    }
+
+    return value;
+  }
+
+  /// Removes slashes from start and end of given path.
+  String _trimSlashes(String path) {
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+    if (path.endsWith('/')) {
+      path = path.substring(0, path.length - 1);
+    }
+    return path;
+  }
+
+  /// Gets the map containing value for given path,
+  /// e.g. given the path foo/bar/baz it returns the map at foo/bar,
+  /// which you can then use to access value at baz.
+  /// If createIfMissing is set to true and nested map will not be found,
+  /// it will be created, so null won't be returned.
+  Map<String, dynamic>? _getDataHandle(
+    String path,
+    Map<String, dynamic>? data, [
+    bool createIfMissing = false,
+  ]) {
+    path = _trimSlashes(path);
+    final pathSegments = path.split('/');
+    if (pathSegments.length == 1) {
+      // nothing to traverse
       return data;
     }
-    return _getNextNodeData(
-      data: data[nodesList[nodeIndex.value]],
-      nodesList: nodesList,
-      nodeIndex: nodeIndex.increment(),
-    );
+
+    // The caller will access the value at key.
+    final segmentsWithoutKey = pathSegments.take(pathSegments.length - 1);
+    Map<String, dynamic>? _data = data;
+    for (var segment in segmentsWithoutKey) {
+      if (_data == null) {
+        if (createIfMissing) {
+          _data = <String, dynamic>{};
+        } else {
+          break;
+        }
+      }
+
+      if (_data[segment] == null && createIfMissing) {
+        _data[segment] = <String, dynamic>{};
+      }
+
+      _data = _data[segment];
+    }
+
+    return _data;
   }
 
   dynamic _getCurrentData() {
+    if (_nodePath == '/') {
+      return _data;
+    }
     var tempData = _data;
     // remove start and end slashes.
-    var nodePath = _nodePath.substring(1, _nodePath.length - 1);
+    var nodePath = _trimSlashes(_nodePath);
     var nodeList = nodePath.split('/');
     if (nodeList.length > 1) {
       for (var i = 0; i < nodeList.length; i++) {
@@ -175,17 +210,9 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     var tempData = _getCurrentData();
     return Future.value(MockDataSnapshot(this, tempData));
   }
-}
 
-class _Int {
-  int value;
-
-  _Int(this.value);
-
-  _Int increment() {
-    ++value;
-    return this;
-  }
+  @override
+  Future<void> remove() => set(null);
 }
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
