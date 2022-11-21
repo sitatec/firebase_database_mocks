@@ -100,6 +100,8 @@ for testing a firebase service that isn't fully mocked.
     - ```child()```
     - ```get()```
     - ```set()```
+    - ```update()```
+    - ```remove()```
     - ```once()``` (```DatabaseEventType.value``` only)
     - ```push()```
 - ```MockDataSnapshot```
