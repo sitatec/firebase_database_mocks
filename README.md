@@ -107,6 +107,9 @@ for testing a firebase service that isn't fully mocked.
     - ```ref```
     - ```value```
     - ```exists```
+    - ```hasChild```
+    - ```child```
+    - ```children```
 
 
 ### Contributing
