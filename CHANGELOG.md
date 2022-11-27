@@ -1,6 +1,8 @@
+# 0.6.0
+* Add methods for children testing in mock_data_snapshot.dart (Thanks @bonnybun)
 ## 0.5.0
 * Implement update and remove methods for MockDatabaseReference (Thanks Zohenn)
-* Added Support for firebase_database 10.0.2 (Thansk @Seyun)
+* Added Support for firebase_database 10.0.2 (Thanks @Seyun)
 ## 0.4.0
 * Fixed setting up mocks with the new firebase_core_platform_interface version
 * Updated dependencies
