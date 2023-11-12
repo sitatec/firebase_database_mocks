@@ -1,4 +1,6 @@
-# 0.6.0
+## 0.6.1
+* Upgrade to flutter and dependencies
+## 0.6.0
 * Add methods for children testing in mock_data_snapshot.dart (Thanks @bonnybun)
 ## 0.5.0
 * Implement update and remove methods for MockDatabaseReference (Thanks Zohenn)
