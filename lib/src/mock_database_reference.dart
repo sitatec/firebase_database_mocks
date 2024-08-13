@@ -213,6 +213,11 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   @override
   Future<void> remove() => set(null);
+
+  @override
+  Future<void> keepSynced(bool value) async {
+    //Do nothing
+  }
 }
 
 // Map<String, dynamic> _makeSupportGenericValue(Map<String, dynamic> data) {
