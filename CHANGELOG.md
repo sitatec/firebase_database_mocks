@@ -1,5 +1,5 @@
 ## 0.7.0
-* Upgraded dependencies (firebase_database to 11.0.4)
+* Upgraded dependencies (firebase_database to 11.1.0)
 * Removed deprecated `reference()` method for `MockFirebaseDatabase`
 ## 0.6.1
 * Upgrade to flutter and dependencies
