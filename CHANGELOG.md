@@ -1,3 +1,5 @@
+## 0.7.1
+* Upgraded firebase_database to 11.2.0 and fix minor issue (Thanks @Lzyct)
 ## 0.7.0
 * Upgraded dependencies (firebase_database to 11.1.0)
 * Removed deprecated `reference()` method for `MockFirebaseDatabase`
