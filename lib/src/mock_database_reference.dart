@@ -15,7 +15,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   MockDatabaseReference([this._volatileData]);
 
-  MockDatabaseReference._(nodePath, [this._volatileData]) {
+  MockDatabaseReference._(String nodePath, [this._volatileData]) {
     _nodePath += nodePath;
   }
 
@@ -31,11 +31,12 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     return _volatileData;
   }
 
-  set _data(data) {
+  set _data(Map<String, dynamic>? data) {
     if (MockFirebaseDatabase.persistData) {
       _persistedData = data;
-    } else
-      return _volatileData = data;
+    } else {
+      _volatileData = data;
+    }
   }
 
   @override
@@ -70,7 +71,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     value = _parseValue(value);
 
     if (_nodePath == '/') {
-      _data = value;
+      _data = value as Map<String, dynamic>?;
       return;
     }
 
@@ -87,7 +88,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
 
   @override
   Future<void> update(Map<String, Object?> value) async {
-    value = _parseValue(value);
+    value = _parseValue(value) as Map<String, Object?>;
     Map<String, dynamic> _baseData = _getDataHandle(_nodePath, _data, true)!;
 
     if (key != null && _baseData[key] == null) {
@@ -95,7 +96,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
     }
 
     if (key != null) {
-      _baseData = _baseData[key]!;
+      _baseData = _baseData[key]! as Map<String, dynamic>;
     }
 
     for (var _key in value.keys) {
@@ -166,7 +167,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
         _data[segment] = <String, dynamic>{};
       }
 
-      _data = _data[segment];
+      _data = _data[segment] as Map<String, dynamic>?;
     }
 
     return _data;
@@ -188,7 +189,7 @@ class MockDatabaseReference extends Mock implements DatabaseReference {
           break;
         }
         if (tempData[nodePath] is Map) {
-          tempData = tempData[nodePath];
+          tempData = tempData[nodePath] as Map<String, dynamic>?;
         }
       }
     }

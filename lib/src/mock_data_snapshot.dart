@@ -53,7 +53,7 @@ class MockDataSnapshot extends Mock implements DataSnapshot {
     if (value is Map) {
       return value
           .map((key, value) =>
-              MapEntry(key, MockDataSnapshot(_ref.child(key), value)))
+              MapEntry(key, MockDataSnapshot(_ref.child(key as String), value)))
           .values;
     } else if (value is List) {
       var index = 0;
