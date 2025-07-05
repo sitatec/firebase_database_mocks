@@ -1,3 +1,5 @@
+## 0.8.0
+* Bump dependencies to major versions (Thanks @jt274)
 ## 0.7.1
 * Upgraded firebase_database to 11.2.0 and fix minor issue (Thanks @Lzyct)
 ## 0.7.0
