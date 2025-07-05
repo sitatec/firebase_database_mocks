@@ -6,7 +6,7 @@ import 'mock_database_reference.dart';
 class MockFirebaseDatabase extends Mock implements FirebaseDatabase {
   static FirebaseDatabase get instance => MockFirebaseDatabase();
 
-  static get persistData => _persistData;
+  static bool get persistData => _persistData;
 
   Map<String, dynamic> _volatileData = <String, dynamic>{};
 
