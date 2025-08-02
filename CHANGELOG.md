@@ -1,3 +1,5 @@
+## 0.8.1
+* Bump dependencies (Thanks @Lzyct)
 ## 0.8.0
 * Bump dependencies to major versions (Thanks @jt274)
 ## 0.7.1
