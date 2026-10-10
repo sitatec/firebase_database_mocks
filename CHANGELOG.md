@@ -1,3 +1,5 @@
+## 0.8.3
+* Bump dependencies (Thanks @jt274)
 ## 0.8.2
 * Bump dependencies (Thanks @jt274 @Wreos)
 ## 0.8.1
