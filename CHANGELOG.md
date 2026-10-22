@@ -1,3 +1,5 @@
+## 0.9.0
+* Support firebase_database 13 (Thanks @jt274)
 ## 0.8.3
 * Bump dependencies (Thanks @jt274)
 ## 0.8.2
